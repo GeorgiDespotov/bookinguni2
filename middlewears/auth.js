@@ -26,15 +26,15 @@ module.exports = () => function (req, res, next) {
 };
 
 
-    
+
 async function register(username, password, email) {
     const existingUsername = await userService.getUserByUsername(username);
     const existingEmail = await userService.getUserByEmail(email);
-    
+
     if (existingEmail) {
         throw new Error('Email is taken!');
     }
-    
+
     if (existingUsername) {
         throw new Error('Username is taken!');
     }
@@ -81,12 +81,12 @@ function parseToken(req, res) {
             const userData = jwt.verify(token, TOKEN_SECRET);
             req.user = userData;
             res.locals.user = userData;
-         } catch (err) {
+        } catch (err) {
             res.clearCookie(COOKIE_NAME);
             res.redirect('/auth/login');
-    
+
             return false;
         }
-    } 
+    }
     return true;
 }

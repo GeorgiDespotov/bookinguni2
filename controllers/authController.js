@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const { body, validationResult } = require('express-validator');
-const { isGuest } = require('../middlewears/guards');
+const { isGuest, isUser } = require('../middlewears/guards');
+const userService = require('../services/user');
+
 
 
 router.get('/register', isGuest(), (req, res) => {
@@ -75,6 +77,18 @@ router.post('/login', isGuest(), async (req, res) => {
 router.get('/logout', (req, res) => {
     req.auth.logout();
     res.redirect('/');
+});
+
+router.get('/profile', isUser(), async (req, res) => {
+    try {
+        const user = await userService.getUserById(req.user._id);
+
+        user.hotelNames = user.bookedHotels.map(hotel => hotel.name).join(', ');
+        res.render('user/profile', { user });
+    } catch (err) {
+        console.log(err.message);
+        res.redirect('/auth/login');
+    }
 });
 
 module.exports = router;

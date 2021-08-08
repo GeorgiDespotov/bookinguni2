@@ -1,4 +1,5 @@
 const Hotel = require('../modews/Hotel');
+const User = require('../modews/User');
 
 async function getAllHotels() {
     return Hotel.find().sort({ freeRooms: -1 }).lean();
@@ -24,10 +25,13 @@ async function createHotel(hotelData) {
 
 async function bookHotel(hotelId, userId) {
     const hotel = await Hotel.findById(hotelId);
+    const user = await User.findById(userId);
 
+    user.bookedHotels.push(hotelId);
     hotel.usersBookedRoom.push(userId);
     hotel.freeRooms--;
 
+    await user.save();
     await hotel.save();
 
     return hotel;
